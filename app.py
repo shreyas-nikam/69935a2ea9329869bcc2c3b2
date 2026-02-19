@@ -18,7 +18,8 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 # -----------------------------
 # Page Config + Global Styling
 # -----------------------------
-st.set_page_config(page_title="QuLab: Lab 37: Stress Testing a Model", layout="wide")
+st.set_page_config(
+    page_title="QuLab: Lab 37: Stress Testing a Model", layout="wide")
 
 st.sidebar.image("https://www.quantuniversity.com/assets/img/logo5.jpg")
 st.sidebar.divider()
@@ -92,7 +93,8 @@ def kpi_row(items):
 
 def require_setup_guard():
     if st.session_state.df_credit_data is None or st.session_state.loaded_model is None:
-        st.warning("Please go to **1. Introduction & Setup** and click **Generate Data & Load Model** first.")
+        st.warning(
+            "Please go to **1. Introduction & Setup** and click **Generate Data & Load Model** first.")
         return True
     return False
 
@@ -113,6 +115,7 @@ def progress_tracker():
     # for label, ok in checks:
     #     st.sidebar.write(("✅ " if ok else "⬜ ") + label)
     pass
+
 
 def severity_from_degradation(deg: float):
     if deg < 0.05:
@@ -178,7 +181,8 @@ def page_intro_setup():
             kind="info",
         )
 
-    st.markdown("## Introduction: Probing Model Vulnerabilities for Regulatory Compliance")
+    st.markdown(
+        "## Introduction: Probing Model Vulnerabilities for Regulatory Compliance")
     st.markdown(
         "As a Model Risk Manager or Quantitative Analyst at a leading financial institution, your core responsibility "
         "transcends merely building accurate models; it's about understanding their limitations and ensuring they meet "
@@ -195,10 +199,14 @@ def page_intro_setup():
         "decisions, ultimately safeguarding the institution against unforeseen model failures."
     )
     st.markdown("We will execute a series of five critical stress tests:")
-    st.markdown("1.  **Distribution Shift Testing:** How does the model perform when economic conditions change dramatically?")
-    st.markdown("2.  **Extreme Value Boundary Mapping:** What happens when input features move far outside their typical ranges?")
-    st.markdown("3.  **Feature Sensitivity Analysis:** Which features drive the model's predictions the most, and are they fragile?")
-    st.markdown("4.  **Adversarial Robustness Testing:** Can borrowers strategically \"game\" the model to flip a credit decision?")
+    st.markdown(
+        "1.  **Distribution Shift Testing:** How does the model perform when economic conditions change dramatically?")
+    st.markdown(
+        "2.  **Extreme Value Boundary Mapping:** What happens when input features move far outside their typical ranges?")
+    st.markdown(
+        "3.  **Feature Sensitivity Analysis:** Which features drive the model's predictions the most, and are they fragile?")
+    st.markdown(
+        "4.  **Adversarial Robustness Testing:** Can borrowers strategically \"game\" the model to flip a credit decision?")
     st.markdown("5.  **Concept Drift Detection:** How quickly does the model's performance degrade over time as underlying relationships evolve?")
     st.markdown(
         "Finally, we will compile our findings into a structured SR 11-7 Stress Test Report, providing a clear "
@@ -230,7 +238,8 @@ def page_intro_setup():
             df_credit_data = generate_synthetic_credit_data(n_samples=15000)
             st.session_state.df_credit_data = df_credit_data
 
-            model, X_train_base, y_train_base, _ = train_and_save_model(df_credit_data)
+            model, X_train_base, y_train_base, _ = train_and_save_model(
+                df_credit_data)
             st.session_state.X_train_base = X_train_base
             st.session_state.y_train_base = y_train_base
 
@@ -243,7 +252,8 @@ def page_intro_setup():
     if st.session_state.loaded_model is not None and st.session_state.X_train_base is not None:
         baseline_auc = roc_auc_score(
             st.session_state.y_train_base,
-            st.session_state.loaded_model.predict_proba(st.session_state.X_train_base)[:, 1]
+            st.session_state.loaded_model.predict_proba(
+                st.session_state.X_train_base)[:, 1]
         )
 
         kpi_row([
@@ -288,7 +298,7 @@ def page_distribution_shift():
 
     tabs = st.tabs(["Context", "Run the test", "Interpretation"])
     with tabs[0]:
-        
+
         st.markdown(
             "As a Model Risk Manager, one of the most critical aspects of SR 11-7 compliance is understanding how our credit "
             "model's performance degrades when the underlying economic environment changes. Our model was built in a specific "
@@ -303,24 +313,34 @@ def page_distribution_shift():
 
         # --- PRESERVE FORMULAE VERBATIM ---
         st.markdown(r"**Mathematical Formulation:**")
-        st.markdown(r"The Distribution Shift Degradation ($\Delta AUC$) is calculated as:")
+        st.markdown(
+            r"The Distribution Shift Degradation ($\Delta AUC$) is calculated as:")
+
+        # Fixed the missing closing braces in the subscripts
         st.markdown(r"""
-$$
-\Delta AUC = AUC_{\text{in-regime} - AUC_{\text{cross-regime}
-$$
-""")
-        st.markdown(r"where $AUC_{\text{in-regime}$ is the Area Under the Receiver Operating Characteristic Curve when the model is evaluated on data from the same economic regime it was trained on (or a similar, stable regime).")
-        st.markdown(r"where $AUC_{\text{cross-regime}$ is the AUC when the model is evaluated on data from a different, challenging economic regime (e.g., recession, crisis).")
+        $$
+        \Delta AUC = AUC_{\text{in-regime}} - AUC_{\text{cross-regime}}
+        $$
+        """)
+
+        # Added missing closing $ for the variables in descriptions
+        st.markdown(
+            r"where $AUC_{\text{in-regime}}$ is the Area Under the Receiver Operating Characteristic Curve when the model is evaluated on data from the same economic regime it was trained on.")
+        st.markdown(
+            r"where $AUC_{\text{cross-regime}}$ is the AUC when the model is evaluated on data from a different, challenging economic regime (e.g., recession, crisis).")
 
         st.markdown(r"**Alert Thresholds for $\Delta AUC$:**")
-        st.markdown(r"-   **Acceptable (Green):** $\Delta AUC < 0.05$. Model generalizes well across regimes.")
-        st.markdown(r"-   **Concerning (Yellow):** $0.05 \le \Delta AUC < 0.10$. Model shows moderate regime sensitivity. Document as a limitation.")
-        st.markdown(r"-   **Failure (Red):** $\Delta AUC \ge 0.10$. Model is regime-dependent. Not suitable for deployment without regime-conditioning or retraining triggers.")
-
+        st.markdown(
+            r"- **Acceptable (Green):** $\Delta AUC < 0.05$. Model generalizes well across regimes.")
+        st.markdown(
+            r"- **Concerning (Yellow):** $0.05 \le \Delta AUC < 0.10$. Model shows moderate regime sensitivity.")
+        st.markdown(
+            r"- **Failure (Red):** $\Delta AUC \ge 0.10$. Model is regime-dependent.")
     with tabs[1]:
         if st.button("Run Distribution Shift Test"):
             with st.spinner("Performing distribution shift analysis..."):
-                regime_splits = create_regime_splits(st.session_state.df_credit_data, date_col="date")
+                regime_splits = create_regime_splits(
+                    st.session_state.df_credit_data, date_col="date")
                 distribution_results = distribution_shift_test(
                     st.session_state.loaded_model,
                     st.session_state.df_credit_data[st.session_state.model_features],
@@ -334,7 +354,8 @@ $$
 
         if st.session_state.distribution_results is not None:
             st.subheader("Results Table")
-            show_cols = ["test_regime", "auc", "auc_degradation", "train_default_rate", "test_default_rate"]
+            show_cols = ["test_regime", "auc", "auc_degradation",
+                         "train_default_rate", "test_default_rate"]
             st.dataframe(st.session_state.distribution_results[show_cols])
 
             # AUC heatmap (matplotlib-based)
@@ -349,12 +370,14 @@ $$
             ax1.set_yticks(np.arange(pivot_auc.shape[0]))
             ax1.set_xticklabels(pivot_auc.columns, rotation=30, ha="right")
             ax1.set_yticklabels(pivot_auc.index)
-            ax1.set_title("AUC Performance Across Economic Regimes (Model trained on Expansion)")
+            ax1.set_title(
+                "AUC Performance Across Economic Regimes (Model trained on Expansion)")
             fig1.colorbar(im, ax=ax1, fraction=0.046, pad=0.04)
             # annotate
             for i in range(pivot_auc.shape[0]):
                 for j in range(pivot_auc.shape[1]):
-                    ax1.text(j, i, f"{pivot_auc.values[i, j]:.3f}", ha="center", va="center")
+                    ax1.text(
+                        j, i, f"{pivot_auc.values[i, j]:.3f}", ha="center", va="center")
             fig1.tight_layout()
             st.pyplot(fig1)
             plt.close(fig1)
@@ -371,17 +394,21 @@ $$
             ax2.set_yticks([0])
             ax2.set_xticklabels(deg_vals.columns, rotation=30, ha="right")
             ax2.set_yticklabels(["ΔAUC vs Expansion"])
-            ax2.set_title("AUC Degradation vs. Expansion Regime (Model trained on Expansion)")
-            fig2.colorbar(im2, ax=ax2, fraction=0.046, pad=0.04, label="AUC Degradation")
+            ax2.set_title(
+                "AUC Degradation vs. Expansion Regime (Model trained on Expansion)")
+            fig2.colorbar(im2, ax=ax2, fraction=0.046,
+                          pad=0.04, label="AUC Degradation")
             for j in range(deg_vals.shape[1]):
-                ax2.text(j, 0, f"{deg_vals.values[0, j]:.3f}", ha="center", va="center")
+                ax2.text(
+                    j, 0, f"{deg_vals.values[0, j]:.3f}", ha="center", va="center")
             fig2.tight_layout()
             st.pyplot(fig2)
             plt.close(fig2)
 
     with tabs[2]:
         if st.session_state.distribution_results is None:
-            st.info("Run the test first to see interpretation guidance tied to your outputs.")
+            st.info(
+                "Run the test first to see interpretation guidance tied to your outputs.")
             return
 
         st.subheader("Degradation severity assessment")
@@ -425,7 +452,8 @@ $$
 # -----------------------------
 def page_boundary_mapping():
     if st.session_state.X_train_base is None or st.session_state.loaded_model is None:
-        st.warning("Please go to '1. Introduction & Setup' and generate data/load model first.")
+        st.warning(
+            "Please go to '1. Introduction & Setup' and generate data/load model first.")
         return
 
     st.title("3. Extreme Value Boundary Mapping")
@@ -438,7 +466,6 @@ def page_boundary_mapping():
             "info",
         )
 
-    
     st.markdown(
         "Regulators demand to know how our model behaves when confronted with input values far outside its training distribution. "
         "This is especially true for features like `DTI` (Debt-to-Income) or `FICO score`, where extreme values, though rare, can "
@@ -451,11 +478,14 @@ def page_boundary_mapping():
         "model was trained on, while holding other features constant at their median. We then observe the predicted probability of default."
     )
 
-    features_for_boundary = ["fico_score", "dti", "income", "ltv", "revolving_utilization", "delinquencies_2yr"]
+    features_for_boundary = ["fico_score", "dti", "income",
+                             "ltv", "revolving_utilization", "delinquencies_2yr"]
     selected_features = st.multiselect(
         "Select features to sweep for boundary mapping:",
-        options=[f for f in features_for_boundary if f in st.session_state.model_features],
-        default=[f for f in ["fico_score", "dti"] if f in st.session_state.model_features],
+        options=[
+            f for f in features_for_boundary if f in st.session_state.model_features],
+        default=[f for f in ["fico_score", "dti"]
+                 if f in st.session_state.model_features],
         key="boundary_feature_select",
         help="Pick the levers you want to stress beyond typical ranges."
     )
@@ -483,15 +513,19 @@ def page_boundary_mapping():
             for i, feature in enumerate(st.session_state.selected_boundary_features):
                 ax = axes[i]
                 res = st.session_state.boundary_results[feature]
-                ax.plot(res["sweep_values"], res["predictions"], label="P(Default)")
+                ax.plot(res["sweep_values"],
+                        res["predictions"], label="P(Default)")
 
-                ax.axvspan(res["training_q01"], res["training_q99"], alpha=0.2, label="Training Range (1-99% quantile)")
+                ax.axvspan(res["training_q01"], res["training_q99"],
+                           alpha=0.2, label="Training Range (1-99% quantile)")
 
                 if not np.isnan(res["cliff_value"]):
-                    ax.axvline(res["cliff_value"], linestyle="--", label=f'Cliff at {res["cliff_value"]:.2f}')
+                    ax.axvline(res["cliff_value"], linestyle="--",
+                               label=f'Cliff at {res["cliff_value"]:.2f}')
 
                 if not res["extrapolation_stable"]:
-                    ax.text(0.05, 0.95, "UNSTABLE Extrapolation", transform=ax.transAxes, fontsize=10, va="top")
+                    ax.text(0.05, 0.95, "UNSTABLE Extrapolation",
+                            transform=ax.transAxes, fontsize=10, va="top")
 
                 ax.set_title(f"P(Default) vs. {feature}")
                 ax.set_xlabel(feature)
@@ -554,12 +588,12 @@ def page_boundary_mapping():
 # -----------------------------
 def page_sensitivity():
     if st.session_state.X_train_base is None or st.session_state.loaded_model is None:
-        st.warning("Please go to '1. Introduction & Setup' and generate data/load model first.")
+        st.warning(
+            "Please go to '1. Introduction & Setup' and generate data/load model first.")
         return
 
     st.title("4. Feature Sensitivity Analysis")
 
-    
     st.markdown(
         "Understanding which features significantly influence a model's output is critical for managing model risk. "
         "As a Model Risk Manager, this is akin to calculating \"duration and convexity\" for a bond portfolio; "
@@ -601,7 +635,8 @@ def page_sensitivity():
         st.dataframe(st.session_state.sensitivity_results)
 
         # Plot: mean_abs_change
-        st.subheader(f"Mean Absolute Change in P(Default) for {perturbation_pct*100:.1f}% Feature Perturbation")
+        st.subheader(
+            f"Mean Absolute Change in P(Default) for {perturbation_pct*100:.1f}% Feature Perturbation")
         fig, ax = plt.subplots(figsize=(10, 5))
         vals = st.session_state.sensitivity_results["mean_abs_change"].values
         labels = st.session_state.sensitivity_results.index.tolist()
@@ -616,7 +651,8 @@ def page_sensitivity():
         plt.close(fig)
 
         # Plot: pct_affected_gt_0.01
-        st.subheader(f"Percentage of Samples with >0.01 P(Default) Change for {perturbation_pct*100:.1f}% Feature Perturbation")
+        st.subheader(
+            f"Percentage of Samples with >0.01 P(Default) Change for {perturbation_pct*100:.1f}% Feature Perturbation")
         fig2, ax2 = plt.subplots(figsize=(10, 5))
         vals2 = st.session_state.sensitivity_results["pct_affected_gt_0.01"].values
         ax2.bar(labels, vals2)
@@ -664,7 +700,6 @@ def page_adversarial():
 
     st.title("5. Adversarial Robustness Testing")
 
-    
     st.markdown(
         "In credit markets, borrowers are incentivized to present the best possible financial profile to secure a loan. "
         "As a Model Risk Manager, I need to know if our credit model can be \"gamed\" by strategic applicants who make minimal "
@@ -721,14 +756,16 @@ def page_adversarial():
         else:
             st.subheader("Adversarial Vulnerability Ranking")
             vuln_features = (
-                st.session_state.adversarial_results_df.groupby("feature")["delta_pct"]
+                st.session_state.adversarial_results_df.groupby("feature")[
+                    "delta_pct"]
                 .mean()
                 .sort_values(ascending=True)
             )
             st.markdown("(Lower delta_pct = easier to game)")
             st.dataframe(vuln_features)
 
-            st.subheader("Features Ranked by Minimum % Perturbation to Flip Prediction (Ease of Gaming)")
+            st.subheader(
+                "Features Ranked by Minimum % Perturbation to Flip Prediction (Ease of Gaming)")
             fig, ax = plt.subplots(figsize=(10, 5))
             ax.bar(vuln_features.index.tolist(), vuln_features.values)
             ax.set_xlabel("Feature")
@@ -763,7 +800,6 @@ def page_concept_drift():
 
     st.title("6. Concept Drift Detection")
 
-    
     st.markdown(
         "Models, particularly in dynamic financial environments, do not remain accurate indefinitely. The underlying relationships "
         "between credit features and default can change over time—a phenomenon known as concept drift."
@@ -775,31 +811,40 @@ def page_concept_drift():
 
     # --- PRESERVE FORMULAE VERBATIM ---
     st.markdown(r"**Mathematical Formulation:**")
-    st.markdown(r"The degradation ($\Delta_t$) in rolling AUC performance is calculated as:")
+    st.markdown(
+        r"The degradation ($\Delta_t$) in rolling AUC performance is calculated as:")
     st.markdown(r"""
 $$
 \Delta_t = AUC_0 - AUC_t
 $$
 """)
-    st.markdown(r"where $AUC_0$ is the baseline AUC on a validation set at deployment time (or a stable reference period).")
-    st.markdown(r"where $AUC_t$ is the rolling AUC calculated over a recent time window.")
+    st.markdown(
+        r"where $AUC_0$ is the baseline AUC on a validation set at deployment time (or a stable reference period).")
+    st.markdown(
+        r"where $AUC_t$ is the rolling AUC calculated over a recent time window.")
 
     st.markdown(r"**Alert Levels for $\Delta_t$:**")
     st.markdown(r"-   **Green:** $\Delta_t < 0.03$. Normal variation.")
-    st.markdown(r"-   **Yellow:** $0.03 \le \Delta_t < 0.07$. Investigate. Check for data quality issues or genuine drift.")
-    st.markdown(r"-   **Red:** $\Delta_t \ge 0.07$. Freeze model for new decisions. Trigger revalidation and possible retraining.")
+    st.markdown(
+        r"-   **Yellow:** $0.03 \le \Delta_t < 0.07$. Investigate. Check for data quality issues or genuine drift.")
+    st.markdown(
+        r"-   **Red:** $\Delta_t \ge 0.07$. Freeze model for new decisions. Trigger revalidation and possible retraining.")
 
     st.markdown(r"**Population Stability Index (PSI):**")
-    st.markdown(r"PSI can supplement AUC monitoring by detecting input distribution shifts even before output performance degrades.")
+    st.markdown(
+        r"PSI can supplement AUC monitoring by detecting input distribution shifts even before output performance degrades.")
     st.markdown(r"""
 $$
 PSI = \sum_{i=1}^{B} \left( P_i^{\text{actual}} - P_i^{\text{expected}} \right) \ln \left( \frac{P_i^{\text{actual}}}{P_i^{\text{expected}}} \right)
 $$
 """)
 
-    st.markdown(r"Where $B$ is the number of bins partitioning the score distribution.")
-    st.markdown(r"Where $P_i^{\text{actual}}$ is the percentage of observations in bin $i$ for the actual population.")
-    st.markdown(r"Where $P_i^{\text{expected}}$ is the percentage of observations in bin $i$ for the expected population.")
+    st.markdown(
+        r"Where $B$ is the number of bins partitioning the score distribution.")
+    st.markdown(
+        r"Where $P_i^{\text{actual}}$ is the percentage of observations in bin $i$ for the actual population.")
+    st.markdown(
+        r"Where $P_i^{\text{expected}}$ is the percentage of observations in bin $i$ for the expected population.")
     st.markdown(r"Where $PSI > 0.25$ indicates a significant population shift.")
 
     # Add a render-friendly PSI (without removing original)
@@ -809,7 +854,8 @@ $$
     PSI = \sum_{i=1}^{B} (P_i^{actual} - P_i^{expected}) \ln \left( \frac{P_i^{actual}}{P_i^{expected}} \right)
     $$
     """)
-        st.caption("Note: This is added for readability; the original formula block above is preserved exactly as in your file.")
+        st.caption(
+            "Note: This is added for readability; the original formula block above is preserved exactly as in your file.")
 
     cd_window_size = st.slider(
         "Rolling Window Size (Days):",
@@ -872,10 +918,12 @@ $$
         st.success("Concept Drift Monitoring Complete!")
 
     if st.session_state.drift_results_df is not None and not st.session_state.drift_results_df.empty:
-        st.subheader(f"Concept Drift Monitor Results (Baseline AUC: {st.session_state.baseline_auc:.4f})")
+        st.subheader(
+            f"Concept Drift Monitor Results (Baseline AUC: {st.session_state.baseline_auc:.4f})")
         st.dataframe(
             st.session_state.drift_results_df[
-                ["window_start", "window_end", "auc", "auc_degradation", "alert_status", "psi_fico_score", "psi_dti"]
+                ["window_start", "window_end", "auc", "auc_degradation",
+                    "alert_status", "psi_fico_score", "psi_dti"]
             ]
         )
 
@@ -891,11 +939,15 @@ $$
             label=f"Baseline AUC ({st.session_state.baseline_auc:.3f})"
         )
 
-        ax_auc.axhspan(st.session_state.baseline_auc - cd_yellow_thresh, st.session_state.baseline_auc, alpha=0.1, label=f"Green Zone (Degradation < {cd_yellow_thresh})")
-        ax_auc.axhspan(st.session_state.baseline_auc - cd_red_thresh, st.session_state.baseline_auc - cd_yellow_thresh, alpha=0.1, label=f"Yellow Zone ({cd_yellow_thresh} <= Degradation < {cd_red_thresh})")
-        ax_auc.axhspan(0, st.session_state.baseline_auc - cd_red_thresh, alpha=0.1, label=f"Red Zone (Degradation >= {cd_red_thresh})")
+        ax_auc.axhspan(st.session_state.baseline_auc - cd_yellow_thresh, st.session_state.baseline_auc,
+                       alpha=0.1, label=f"Green Zone (Degradation < {cd_yellow_thresh})")
+        ax_auc.axhspan(st.session_state.baseline_auc - cd_red_thresh, st.session_state.baseline_auc -
+                       cd_yellow_thresh, alpha=0.1, label=f"Yellow Zone ({cd_yellow_thresh} <= Degradation < {cd_red_thresh})")
+        ax_auc.axhspan(0, st.session_state.baseline_auc - cd_red_thresh,
+                       alpha=0.1, label=f"Red Zone (Degradation >= {cd_red_thresh})")
 
-        ax_auc.set_title("Concept Drift Monitor: Rolling AUC Performance Over Time")
+        ax_auc.set_title(
+            "Concept Drift Monitor: Rolling AUC Performance Over Time")
         ax_auc.set_xlabel("Window Start Date")
         ax_auc.set_ylabel("AUC")
         ax_auc.set_ylim(0, 1)
@@ -906,7 +958,8 @@ $$
         plt.close(fig_auc)
 
         if "psi_fico_score" in st.session_state.drift_results_df.columns:
-            st.subheader("Population Stability Index (PSI) for FICO Score Over Time")
+            st.subheader(
+                "Population Stability Index (PSI) for FICO Score Over Time")
             fig_psi, ax_psi = plt.subplots(figsize=(14, 4))
             ax_psi.plot(
                 x,
@@ -914,7 +967,8 @@ $$
                 marker="x",
                 markersize=4
             )
-            ax_psi.axhline(y=cd_psi_thresh, linestyle="--", label=f"PSI Alert Threshold ({cd_psi_thresh:.2f})")
+            ax_psi.axhline(y=cd_psi_thresh, linestyle="--",
+                           label=f"PSI Alert Threshold ({cd_psi_thresh:.2f})")
             ax_psi.set_title("PSI (FICO Score) Over Time")
             ax_psi.set_xlabel("Window Start Date")
             ax_psi.set_ylabel("PSI Value")
@@ -954,12 +1008,12 @@ def page_report():
     )
 
     if not can_generate_report:
-        st.warning("Please run all preceding stress tests (2-6) to generate the comprehensive SR 11-7 report.")
+        st.warning(
+            "Please run all preceding stress tests (2-6) to generate the comprehensive SR 11-7 report.")
         return
 
     st.title("7. Compile SR 11-7 Aligned Stress Test Report")
 
-    
     st.markdown(
         "After conducting a thorough suite of stress tests, the final and most crucial step for a Model Risk Manager is to "
         "consolidate all findings into a structured SR 11-7 report. This document is the ultimate deliverable, serving as "
@@ -993,24 +1047,31 @@ def page_report():
         st.markdown("---")
         st.markdown(f"**Model:** `{report['model_name']}`")
         st.markdown(f"**Report Date:** `{report['report_date']}`")
-        st.markdown(f"**Overall Assessment:** `{report['overall_assessment']}`")
+        st.markdown(
+            f"**Overall Assessment:** `{report['overall_assessment']}`")
         st.markdown("---")
 
         st.markdown("### FINDINGS:")
         for test, finding in report["findings"].items():
-            st.markdown(f"#### {test.replace('_', ' ').upper()} [{finding['severity']}]:")
+            st.markdown(
+                f"#### {test.replace('_', ' ').upper()} [{finding['severity']}]:")
             st.markdown(f"- **Recommendation:** {finding['recommendation']}")
 
             if test == "distribution_shift":
-                st.markdown(f"  - Max AUC Degradation: {finding.get('max_auc_degradation', 'N/A'):.3f} (Worst: {finding.get('worst_regime_pair', 'N/A')})")
+                st.markdown(
+                    f"  - Max AUC Degradation: {finding.get('max_auc_degradation', 'N/A'):.3f} (Worst: {finding.get('worst_regime_pair', 'N/A')})")
             elif test == "extreme_values":
-                st.markdown(f"  - Unstable Features: {', '.join(finding.get('unstable_features', [])) if finding.get('unstable_features') else 'None'}")
+                st.markdown(
+                    f"  - Unstable Features: {', '.join(finding.get('unstable_features', [])) if finding.get('unstable_features') else 'None'}")
             elif test == "sensitivity":
-                st.markdown(f"  - Most Sensitive Feature: {finding.get('most_sensitive_feature', 'N/A')} (Max Sensitivity: {finding.get('max_sensitivity', np.nan):.3f})")
+                st.markdown(
+                    f"  - Most Sensitive Feature: {finding.get('most_sensitive_feature', 'N/A')} (Max Sensitivity: {finding.get('max_sensitivity', np.nan):.3f})")
             elif test == "adversarial":
-                st.markdown(f"  - Most Gameable Feature: {finding.get('most_gameable_feature', 'N/A')} (Min Perturbation to Flip: {finding.get('min_perturbation_to_flip', np.nan):.2%})")
+                st.markdown(
+                    f"  - Most Gameable Feature: {finding.get('most_gameable_feature', 'N/A')} (Min Perturbation to Flip: {finding.get('min_perturbation_to_flip', np.nan):.2%})")
             elif test == "concept_drift":
-                st.markdown(f"  - Drift Alerts Triggered: {finding.get('drift_alerts', 0)}")
+                st.markdown(
+                    f"  - Drift Alerts Triggered: {finding.get('drift_alerts', 0)}")
 
             st.markdown("")
 
@@ -1019,7 +1080,8 @@ def page_report():
             for boundary in report["use_boundaries"]:
                 st.markdown(f" - {boundary}")
         else:
-            st.markdown(" - No specific use boundaries recommended at this time, continue standard monitoring.")
+            st.markdown(
+                " - No specific use boundaries recommended at this time, continue standard monitoring.")
 
         st.markdown("### SIGN-OFF REQUIRED:")
         for signoff in report["sign_off_required"]:
@@ -1047,11 +1109,13 @@ FINDINGS:
 
         if test == "distribution_shift":
             max_deg = finding.get("max_auc_degradation", "N/A")
-            formatted_max_deg = f"{max_deg:.3f}" if isinstance(max_deg, (int, float)) else str(max_deg)
+            formatted_max_deg = f"{max_deg:.3f}" if isinstance(
+                max_deg, (int, float)) else str(max_deg)
             report_text += f"  Max AUC Degradation: {formatted_max_deg}\n"
             report_text += f"  Worst Regime Pair: {finding.get('worst_regime_pair', 'N/A')}\n"
         elif test == "extreme_values":
-            unstable = ", ".join(finding.get("unstable_features", [])) if finding.get("unstable_features") else "None"
+            unstable = ", ".join(finding.get("unstable_features", [])) if finding.get(
+                "unstable_features") else "None"
             report_text += f"  Unstable Features: {unstable}\n"
         elif test == "sensitivity":
             report_text += f"  Most Sensitive Feature: {finding.get('most_sensitive_feature', 'N/A')}\n"
